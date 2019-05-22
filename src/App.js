@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route } from 'react-router-dom';
+import Layout from './commons/Layout';
 import logo from './logo.svg';
 import './App.css';
 
@@ -25,9 +26,9 @@ const Login = setUpLoadable('Login');
 function App() {
   return (
     <BrowserRouter>
-      <Route path="/" exact component={Home}/>
-      <Route path="/register" component={Register}/>
-      <Route path="/login" component={Login}/>
+      <Layout path="/" exact component={Home}/>
+      <Layout path="/register" component={Register}/>
+      <Layout path="/login" component={Login}/>
     </BrowserRouter>
   );
 }
