@@ -27,8 +27,8 @@ function App() {
   return (
     <BrowserRouter>
       <Layout path="/" exact component={Home}/>
-      <Layout path="/register" component={Register}/>
-      <Layout path="/login" component={Login}/>
+      <Layout auth path="/register" component={Register}/>
+      <Layout auth path="/login" component={Login}/>
     </BrowserRouter>
   );
 }

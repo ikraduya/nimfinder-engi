@@ -5,6 +5,18 @@ import Header from '../Header';
 import Footer from '../Footer';
 
 class Layout extends Component {
+  constructor(props) {
+    super(props);
+    this.renderHeader = this.renderHeader.bind(this);
+  }
+
+  renderHeader(auth) {
+    if (!auth) {
+      return (<Header />);
+    }
+    return (<div className="my-4"/>);
+  }
+
   render() {
     const { component: Component, ...rest } = this.props;
   
@@ -12,7 +24,8 @@ class Layout extends Component {
       <Route {...rest} render={(props) => {
         return (
           <div>
-            <Header />
+            {/* <Header /> */}
+            {this.renderHeader(rest.auth)}
             <Component {...props}/>
             <Footer />
           </div>

@@ -20,6 +20,7 @@ class Login extends React.PureComponent {
       username: '',
       password: '',
       loading: false,
+      usernameError: '',
       passwordError: '',
       error: '',
       redirect: '',
@@ -65,15 +66,20 @@ class Login extends React.PureComponent {
   }
 
   handleUsernameChange({ target }) {
+    let usernameError = "";
+    
+    if (target.value && target.value.length > 20) {
+      usernameError = "Username melebihi batas 20 karakter";
+    }
     this.setState({
       username: target.value,
-      error: '',
-    })
+      usernameError,
+    });
   }
 
   handlePasswordChange({ target }) {
     this.setState({
-      username: target.value,
+      password: target.value,
       error: '',
     })
   }
@@ -105,7 +111,7 @@ class Login extends React.PureComponent {
   }
   
   render() {
-    const { username, password, loading, passwordError, redirect } = this.state;
+    const { username, password, loading, usernameError, passwordError, redirect } = this.state;
     if (redirect) {
       return (
         <Redirect
@@ -116,9 +122,9 @@ class Login extends React.PureComponent {
     }
     return (
       <Container>
-          <Row>
+          <Row className="mb-2">
             <Col sm="12">
-              <h1>Log In to Engi's NIMFinder</h1>
+              <h1>Log In to Aromage NIMFinder</h1>
             </Col>
           </Row>
 					<Row>
@@ -126,6 +132,7 @@ class Login extends React.PureComponent {
               { this.renderError() }
 							<form>
                 <FormGroup>
+                  <Label for="login-username">Username</Label>
                   <Input
                     type="text"
                     onChange={this.handleUsernameChange}
@@ -133,11 +140,13 @@ class Login extends React.PureComponent {
                     name="username"
                     id="login-username"
                     placeholder=" "
+                    invalid={(usernameError.length > 0)}
                   />
-                  <Label for="login-username">Username</Label>
+                  <FormFeedback style={{ display: (usernameError.length > 0 && username !== '') ? 'block' : 'none' }}>{usernameError}</FormFeedback>
                 </FormGroup>
 
                 <FormGroup>
+                  <Label for="login-password">Password</Label>
                   <Input
                     type="password"
                     name="password"
@@ -146,13 +155,11 @@ class Login extends React.PureComponent {
                     placeholder=" "
                     value={password || ''}
                   />
-                  <Label for="login-password">Password</Label>
                   <FormFeedback style={{ display: (passwordError.length > 0 && password !== '') ? 'block' : 'none' }}>{passwordError}</FormFeedback>
                 </FormGroup>
 
                 <Button
                   color="primary"
-                  className='btn-red'
                   block
                   onClick={this.onLoginPress}
                   type="submit"
@@ -160,6 +167,10 @@ class Login extends React.PureComponent {
                 >
                   {this.renderButtonText()}
                 </Button>
+
+                <div className="text-center mt-2">
+                  <a href="/register">Don&apos;t have account? Sign Up</a>
+                </div>
               </form>
 						</Col>
 					</Row>

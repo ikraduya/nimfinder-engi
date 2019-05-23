@@ -8,6 +8,7 @@ import {
   FormGroup,
   Label,
   Input,
+  FormFeedback,
 } from 'reactstrap';
 import { post } from 'axios';
 import Swal from 'sweetalert2';
@@ -23,91 +24,130 @@ class Register extends React.PureComponent {
       password: '',
       conpassword: '',
       passwordError: '',
-      passwordConfirmation: '',
       redirect: '',
+      usernameError: '',
     };
     this.handleUsernameChange = this.handleUsernameChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
-    this.handleConnPasswordChange = this.handleConnPasswordChange.bind(this);
+    this.handleConPasswordChange = this.handleConPasswordChange.bind(this);
     this.onRegisterPress = this.onRegisterPress.bind(this);
   }
 
-  handleUsernameChange(event) {
+  handleUsernameChange({target}) {
+    let usernameError = "";
+    if (target.value && target.value.length > 20) {
+      usernameError = "Username melebihi batas 20 karakter"
+    }
     this.setState({
-      username: event.target.value
+      username: target.value,
+      usernameError
     });
   }
 
-  handlePasswordChange(event) {
+  handlePasswordChange({target}) {
+    const { conpassword } = this.state;
+
+    let passwordError = "";
+    if (conpassword.length === target.value.length && conpassword !== target.value) {
+      passwordError = "Confirmation password doesn't match";
+    }
     this.setState({
-      password: event.target.value
+      password: target.value,
+      passwordError,
     });
   }
 
-  handleConnPasswordChange(event) {
+  handleConPasswordChange({target}) {
+    const { password } = this.state;
+
+    let passwordError = "";
+    if (password.length === target.value.length && password !== target.value) {
+      passwordError = "Confirmation password doesn't match";
+    }
     this.setState({
-      conpassword: event.target.value
+      conpassword: target.value,
+      passwordError,
     });
   }
+
+  // username: kira
+  // pass: passkira
 
   onRegisterPress() {
-    const { username, password, passwordConfirmation } = this.state;
-    if (password !== passwordConfirmation) {
+    const { username, password, conpassword } = this.state;
+    if (password !== conpassword) {
       this.setState({
         passwordError: "Password confirmation doesn't match",
       })
     } else {
-      post('https://api.stya.net/nim/register', {
-        username,
-        password,
-      })
-        .then(({ data }) => {
-          if (data.status === "OK") {
-            this.setState({
-              email: '',
-              firstname: '',
-              lastname: '',
-              password: '',
-              passwordConfirmation: '',
-            }, () => {
-              Swal({
-                title: 'Success',
-                type: 'success',
-                text: 'Register success, please login',
-                timer: '1500',
-                animation: true,
-              }, () => {
-                this.setState({
-                  loading: false,
-                  redirect: '/login',
-                });
-              })
-            });
-          } else {
-            Swal({
-              title: 'Failed',
-              type: 'info',
-              text: data.message,
-              timer: '1500',
-              animation: true
-            });
-            this.setState({
-              username: '',
-              password: '',
-              passwordConfirmation: '',
-            });
-          }
-        })
-        .catch(() => {
-          Swal({
-            title: 'Error',
-            type: 'error',
-            text: 'Failed to contact the server',
-            timer: '1500',
-            animation: true
-          });
+      Swal.fire({
+        title: 'Success',
+        type: 'success',
+        text: 'Register success, please login',
+        timer: '1500',
+        animation: true,
+      }).then(() => {
+        console.log("hey");
+        this.setState({
+          loading: false,
+          redirect: '/login',
         });
+      })
+      console.log("masuk");
+      console.log(username + " " + password);
+      // post('https://api.stya.net/nim/register', {
+      //   username,
+      //   password,
+      // })
+      //   .then(({ data }) => {
+      //     if (data.status === "OK") {
+      //       this.setState({
+      //         email: '',
+      //         firstname: '',
+      //         lastname: '',
+      //         password: '',
+      //         passwordConfirmation: '',
+      //       }, () => {
+      //         Swal({
+      //           title: 'Success',
+      //           type: 'success',
+      //           text: 'Register success, please login',
+      //           timer: '1500',
+      //           animation: true,
+      //         }, () => {
+      //           this.setState({
+      //             loading: false,
+      //             redirect: '/login',
+      //           });
+      //         })
+      //       });
+      //     } else {
+      //       Swal({
+      //         title: 'Failed',
+      //         type: 'info',
+      //         text: data.message,
+      //         timer: '1500',
+      //         animation: true
+      //       });
+      //       this.setState({
+      //         username: '',
+      //         password: '',
+      //         passwordConfirmation: '',
+      //       });
+      //     }
+      //   })
+      //   .catch(() => {
+      //     Swal({
+      //       title: 'Error',
+      //       type: 'error',
+      //       text: 'Failed to contact the server',
+      //       timer: '1500',
+      //       animation: true
+      //     });
+      //   });
     }
+
+    return false;
   }
 
   renderButtonText() {
@@ -125,7 +165,7 @@ class Register extends React.PureComponent {
   }
 
   render() {
-    const { username, password, passwordConfirmation, passwordError, loading, redirect } = this.state;
+    const { username, password, conpassword, usernameError, passwordError, loading, redirect } = this.state;
     if (redirect) {
       return (
         <Redirect
@@ -137,15 +177,16 @@ class Register extends React.PureComponent {
 
     return (
       <Container>
-        <Row>
+        <Row className="mb-2">
           <Col sm="12">
-            <h1>Register to Engi's NIMFinder</h1>
+            <h1>Register to Aromage NIMFinder</h1>
           </Col>
         </Row>
         <Row>
           <Col sm="12">
-            <Form>
+            <Form onSubmit={(e) => e.preventDefault()}>
               <FormGroup>
+                <Label for="register-username">Username</Label>
                 <Input 
                   type="text"
                   onChange={this.handleUsernameChange}
@@ -153,11 +194,13 @@ class Register extends React.PureComponent {
                   name="username"
                   id="register-username"
                   placeholder=" "
+                  invalid={(usernameError.length > 0)}
                 />
-                <Label for="register-username">Username</Label>
+                <FormFeedback style={{ display: (usernameError.length > 0 && username !== '') ? 'block' : 'none' }}>{usernameError}</FormFeedback>
               </FormGroup>
 
               <FormGroup>
+                <Label for="register-password">Password</Label>
                 <Input 
                   type="password"
                   name="password"
@@ -166,19 +209,21 @@ class Register extends React.PureComponent {
                   placeholder=" "
                   value={password || ''}
                 />
-                <Label for="register-password">Password</Label>
               </FormGroup>
 
               <FormGroup>
+                <Label for="register-conpassword">Password Confirmation</Label>
                 <Input
                   type="password"
                   name="conpassword"
                   id="register-conpassword"
                   onChange={this.handleConPasswordChange}
                   placeholder=" "
-                  value={passwordConfirmation || ''}
+                  value={conpassword || ''}
+                  invalid={(passwordError.length > 0)}
+                  valid={(passwordError.length === 0 && password === conpassword && password.length > 0)}
                 />
-                <Label for="register-conpassword">Password Confirmation</Label>
+                <FormFeedback style={{ display: (passwordError.length > 0 && password !== '') ? 'block' : 'none' }}>{passwordError}</FormFeedback>
               </FormGroup>
 
               <Button
@@ -187,10 +232,14 @@ class Register extends React.PureComponent {
                 block
                 onClick={this.onRegisterPress}
                 type="submit"
-                disabled={passwordError.length > 0 || loading || username.length < 1 || password.length < 1 || username.length > 20}
+                disabled={passwordError.length > 0 || loading || username.length < 1 || password.length < 1 || password.length !== conpassword.length || username.length > 20}
               >
                 {this.renderButtonText()}
               </Button>
+
+              <div className="text-center mt-2">
+                <a href="/login">Already have an account account? Sign In</a>
+              </div>
             </Form>
           </Col>
         </Row>
