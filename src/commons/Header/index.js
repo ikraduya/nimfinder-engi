@@ -8,19 +8,17 @@ import {
   Nav,
   NavItem,
   NavLink,
-  ButtonDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
-  UncontrolledDropdown,
 } from 'reactstrap';
 import { Link, Redirect} from 'react-router-dom';
+import Cookies from 'universal-cookie';
 
 class Header extends React.Component {
   constructor(props) {
     super(props);
 
     this.toggle = this.toggle.bind(this);
+    this.handleLogout = this.handleLogout.bind(this);
+
     this.state = {
       redirect: '',
       isOpen: false,
@@ -31,6 +29,14 @@ class Header extends React.Component {
     this.setState({
       isOpen: !this.state.isOpen,
     });
+  }
+
+  handleLogout() {
+    const cookies = new Cookies();
+    cookies.remove('token');
+    this.setState({
+      redirect: '/login'
+    })
   }
 
   render() {
@@ -48,7 +54,7 @@ class Header extends React.Component {
           <Collapse isOpen={this.state.isOpen} navbar>
             <Nav className="ml-auto" navbar>
               <NavItem>
-                <NavLink href="/login/">Logout</NavLink>
+                <NavLink onClick={this.handleLogout} href="#">Logout</NavLink>
               </NavItem>
             </Nav>
           </Collapse>

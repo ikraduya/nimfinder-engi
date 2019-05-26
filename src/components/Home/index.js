@@ -20,6 +20,8 @@ import {
   PaginationItem,
   PaginationLink,
 } from 'reactstrap';
+import Swal from 'sweetalert2';
+import { Redirect, withRouter } from 'react-router-dom';
 import Cookies from 'universal-cookie';
 
 class Home extends React.PureComponent {
@@ -30,29 +32,56 @@ class Home extends React.PureComponent {
     this.toggleDropDownResultPerPage = this.toggleDropDownResultPerPage.bind(this);
     this.selectSearchByParam = this.selectSearchByParam.bind(this);
     this.selectResultPerPageParam = this.selectResultPerPageParam.bind(this);
+    this.handleSearchTextChange = this.handleSearchTextChange.bind(this);
+    this.fetchStudentData = this.fetchStudentData.bind(this);
 
     this.state = {
-      dropDownSearchByText: 'Search By',
+      dropDownSearchByText: 'Search By: NIM',
       dropDownSearchByOpen: false,
-      dropDownResultPerPageText: 'Result Per Page',
+      dropDownResultPerPageText: 'Result Per Page: 10',
       dropDownResultPerPageOpen: false,
       studentList: [],
       
       // Fetchdata params
+      searchText: '',
       page: 0,
-      searchBy: 'NIM',
+      searchBy: 'id',
       maxItem: 10,
+      cookiesToken: '',
 
       // pagination
       prevBtnEnable: false,
       nextBtnEnable: false,
+
+      redirect: '',
     }
   }
 
   componentDidMount() {
-    // const cookies = new Cookies();
-    // cookies.set('myCat', 'Pacman', {path: '/'})
-    // console.log(cookies.get('myCat')); // Pacman
+    const cookies = new Cookies();
+    const cookiesToken = cookies.get('token');
+    if (!cookiesToken || cookiesToken === '') {  // redirect to login
+      Swal.fire({
+        title: 'You need to Log In first!',
+        type: 'info',
+        timer: '2000',
+        animation: true
+      }).then(() => {
+        this.setState({
+          redirect: '/login',
+        })
+      })
+    } else {
+      this.setState({
+        cookiesToken,
+      })
+    }
+  }
+
+  handleSearchTextChange({ target }) {
+    this.setState({
+      searchText: target.value,
+    });
   }
 
   toggleDropDownSearchBy() {
@@ -69,7 +98,7 @@ class Home extends React.PureComponent {
 
   selectSearchByParam({ target }) {
     this.setState({
-      dropDownSearchByText: 'Search By: ' + target.value,
+      dropDownSearchByText: 'Search By: ' + target.name,
       searchBy: target.value,
     });
   }
@@ -82,9 +111,42 @@ class Home extends React.PureComponent {
   }
 
   fetchStudentData() {
-    const { searchBy, maxItem } = this.state;
+    const { searchText, searchBy, maxItem, page, cookiesToken } = this.state;
 
-    // axios.get()
+    let params;
+    if (searchBy === "id") {
+      params = {
+        query: searchText,
+        count: maxItem,
+        page,
+      }
+    } else {  // by name
+      params = {
+        name: searchText,
+        count: maxItem,
+        page,
+      }
+    }
+    axios.get('https://api.stya.net/nim/by' + searchBy, {
+      params,
+      headers: {
+        'Access-Control-Allow-Headers':'application/json',
+        // Cookie: "token=" + cookiesToken,
+        // TODO: cari cara agar tidak terjadi "refused to set unsafe header"
+        Cookie: document.cookie
+      },
+      // withCredentials:true
+    })
+      .then(({data}) => {
+        console.log("data", data);
+      })
+      .catch(() => {
+        Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: 'Could not contact the server'
+        });
+      })
   }
 
   renderPagination() {
@@ -103,7 +165,15 @@ class Home extends React.PureComponent {
   }
   
   render() {
-    const { dropDownSearchByOpen, dropDownSearchByText, dropDownResultPerPageOpen, dropDownResultPerPageText } = this.state;
+    const { redirect, searchText, dropDownSearchByOpen, dropDownSearchByText, dropDownResultPerPageOpen, dropDownResultPerPageText } = this.state;
+    if (redirect) {
+      return (
+        <Redirect
+          to={{pathname: redirect}}
+          push
+        />
+      );
+    }
 
     return (
       <div>
@@ -113,15 +183,20 @@ class Home extends React.PureComponent {
               <Card className="home-card">
                 <CardHeader>
                   <InputGroup>
-                    <Input placeholder="Search..." />
+                    <Input 
+                      placeholder="Search..." 
+                      onChange={this.handleSearchTextChange}
+                      value={searchText || ''}
+                      name="search-text"
+                    />
                     
                     <InputGroupButtonDropdown addonType="append" isOpen={dropDownSearchByOpen} toggle={this.toggleDropDownSearchBy}>
                       <DropdownToggle color="success" caret>
                         {dropDownSearchByText}
                       </DropdownToggle>
                       <DropdownMenu  onClick={this.selectSearchByParam}>
-                        <DropdownItem value="NIM">NIM</DropdownItem>
-                        <DropdownItem value="Nama">Nama</DropdownItem>
+                        <DropdownItem name="NIM" value="id">NIM</DropdownItem>
+                        <DropdownItem name="Nama" value="name">Nama</DropdownItem>
                       </DropdownMenu>
                     </InputGroupButtonDropdown>
 
@@ -137,7 +212,7 @@ class Home extends React.PureComponent {
                       </DropdownMenu>
                     </InputGroupButtonDropdown>
 
-                    <Button className="ml-2" color="primary">Search</Button>
+                    <Button className="ml-2" color="primary" onClick={this.fetchStudentData}>Search</Button>
                   </InputGroup>
                 </CardHeader>
 
@@ -153,16 +228,16 @@ class Home extends React.PureComponent {
                     </thead>
                     <tbody>
                       <tr>
-                        <th scope="row">Ikraduya Edian</th>
-                        <th>16517187</th>
-                        <th>13517106</th>
-                        <th>Teknik Informatika</th>
+                        <td>Ikraduya Edian</td>
+                        <td>16517187</td>
+                        <td>13517106</td>
+                        <td>Teknik Informatika</td>
                       </tr>
                       <tr>
-                        <th scope="row">Ikraduya Edian 2</th>
-                        <th>16517000</th>
-                        <th>13517000</th>
-                        <th>Teknik Informatika</th>
+                        <td>Ikraduya Edian 2</td>
+                        <td>16517000</td>
+                        <td>13517000</td>
+                        <td>Teknik Informatika</td>
                       </tr>
                     </tbody>
                   </Table>
@@ -178,4 +253,4 @@ class Home extends React.PureComponent {
   }
 }
 
-export default Home;
+export default withRouter(Home);
