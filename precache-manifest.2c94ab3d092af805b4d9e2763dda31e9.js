@@ -1,23 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "1816f5d31a672105f74bebd454b2aca5",
+    "revision": "fa051569e895fb112bae6a932ca12c70",
     "url": "/nimfinder-engi/index.html"
   },
   {
-    "revision": "4aafafefa5f26a47e341",
+    "revision": "cad5df3949fb1cccc054",
     "url": "/nimfinder-engi/static/css/2.b91c24ea.chunk.css"
   },
   {
-    "revision": "ab5af6a861ae37630b88",
+    "revision": "e99d9d66218144edfdc0",
     "url": "/nimfinder-engi/static/css/main.2cce8147.chunk.css"
   },
   {
-    "revision": "4aafafefa5f26a47e341",
-    "url": "/nimfinder-engi/static/js/2.50955cdd.chunk.js"
+    "revision": "cad5df3949fb1cccc054",
+    "url": "/nimfinder-engi/static/js/2.da4f29c4.chunk.js"
   },
   {
-    "revision": "ab5af6a861ae37630b88",
-    "url": "/nimfinder-engi/static/js/main.7a53654f.chunk.js"
+    "revision": "e99d9d66218144edfdc0",
+    "url": "/nimfinder-engi/static/js/main.4dd9eceb.chunk.js"
   },
   {
     "revision": "70581097d312a60b9c0a",
@@ -42,9 +42,5 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "fee66e712a8a08eef5805a46892932ad",
     "url": "/nimfinder-engi/static/media/fontawesome-webfont.fee66e71.woff"
-  },
-  {
-    "revision": "5d5d9eefa31e5e13a6610d9fa7a283bb",
-    "url": "/nimfinder-engi/static/media/logo.5d5d9eef.svg"
   }
 ]);
