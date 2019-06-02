@@ -2,10 +2,6 @@ import React from 'react';
 import { Container, Row, Col } from 'reactstrap';
 
 class Footer extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     return (
       <Container>

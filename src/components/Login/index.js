@@ -82,7 +82,7 @@ class Login extends React.PureComponent {
             const cookies = new Cookies();
             cookies.set('token', data.token, {
               maxAge: 60 * 60 * 24, 
-              domain: "https://api.stya.net/nim",
+              // domain: "https://api.stya.net/nim",
             });
             this.setState({
               loading: false,

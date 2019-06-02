@@ -23,6 +23,7 @@ import {
 import Swal from 'sweetalert2';
 import { Redirect, withRouter } from 'react-router-dom';
 import Cookies from 'universal-cookie';
+// import * as xhr2 from 'xhr2';
 
 class Home extends React.PureComponent {
   constructor(props) {
@@ -33,7 +34,10 @@ class Home extends React.PureComponent {
     this.selectSearchByParam = this.selectSearchByParam.bind(this);
     this.selectResultPerPageParam = this.selectResultPerPageParam.bind(this);
     this.handleSearchTextChange = this.handleSearchTextChange.bind(this);
+    this.handlePageChange = this.handlePageChange.bind(this);
     this.fetchStudentData = this.fetchStudentData.bind(this);
+    this.renderPagination = this.renderPagination.bind(this);
+    this.renderStudentList = this.renderStudentList.bind(this);
 
     this.state = {
       dropDownSearchByText: 'Search By: NIM',
@@ -43,7 +47,7 @@ class Home extends React.PureComponent {
       studentList: [],
       
       // Fetchdata params
-      searchText: '',
+      searchText: '13517',
       page: 0,
       searchBy: 'id',
       maxItem: 10,
@@ -54,6 +58,7 @@ class Home extends React.PureComponent {
       nextBtnEnable: false,
 
       redirect: '',
+      nextPageAvailable: false,
     }
   }
 
@@ -74,6 +79,8 @@ class Home extends React.PureComponent {
     } else {
       this.setState({
         cookiesToken,
+      }, () => {
+        this.fetchStudentData();
       })
     }
   }
@@ -81,6 +88,14 @@ class Home extends React.PureComponent {
   handleSearchTextChange({ target }) {
     this.setState({
       searchText: target.value,
+    });
+  }
+
+  handlePageChange(targetPage) {
+    this.setState({
+      page: targetPage,
+    }, () => {
+      this.fetchStudentData();
     });
   }
 
@@ -114,7 +129,7 @@ class Home extends React.PureComponent {
     const { searchText, searchBy, maxItem, page, cookiesToken } = this.state;
 
     let params;
-    if (searchBy === "id") {
+    if (searchBy === "id") {  // by nim
       params = {
         query: searchText,
         count: maxItem,
@@ -127,18 +142,50 @@ class Home extends React.PureComponent {
         page,
       }
     }
+
     axios.get('https://api.stya.net/nim/by' + searchBy, {
       params,
       headers: {
-        'Access-Control-Allow-Headers':'application/json',
-        // Cookie: "token=" + cookiesToken,
-        // TODO: cari cara agar tidak terjadi "refused to set unsafe header"
-        Cookie: document.cookie
+        'Auth-Token': cookiesToken
       },
-      // withCredentials:true
     })
       .then(({data}) => {
-        console.log("data", data);
+        if (data && data.status === "OK") {
+          this.setState({
+            studentList: data.payload
+          })
+
+          if (data.payload.length > 0) {
+            // check whether next page available
+            params.page += 1;
+            axios.get('https://api.stya.net/nim/by' + searchBy, {
+              params,
+              headers: {
+                'Auth-Token': cookiesToken
+              },
+            })
+              .then(({data: nextData}) => {
+                if (nextData && nextData.payload && nextData.payload.length > 0) {
+                  this.setState({
+                    nextPageAvailable: true,
+                  })
+                }
+              })
+          } else {
+            this.setState({
+              nextPageAvailable: false,
+            })
+          }
+          
+        } else {
+          Swal.fire({
+            title: 'Oops..',
+            type: 'info',
+            text: 'Could not contact the server',
+            timer: '2000',
+            animation: true
+          });
+        }
       })
       .catch(() => {
         Swal.fire({
@@ -150,17 +197,42 @@ class Home extends React.PureComponent {
   }
 
   renderPagination() {
-    const { page } = this.state;
+    const { page, nextPageAvailable } = this.state;
 
     return (
       <Pagination>
-        <PaginationItem className="text-center"  style={{marginRight: "auto", width: "90px"}}>
-          <PaginationLink href="#" >Previous</PaginationLink>
+        <PaginationItem className="text-center"  style={{marginRight: "auto", width: "90px"}} disabled={page === 0}>
+          <PaginationLink href="#" onClick={() => this.handlePageChange(page-1)} >Previous</PaginationLink>
         </PaginationItem>
-        <PaginationItem className="text-center" style={{marginLeft: "auto", width: "90px"}}>
-          <PaginationLink href="#" >Next</PaginationLink>
+        <PaginationItem className="text-center" style={{marginLeft: "auto", width: "90px"}} disabled={!nextPageAvailable}>
+          <PaginationLink href="#" onClick={() => this.handlePageChange(page+1)} >Next</PaginationLink>
         </PaginationItem>
       </Pagination>
+    );
+  }
+
+  renderStudentList() {
+    const { studentList } = this.state;
+    if (studentList.length > 0) {
+      return studentList.map((student, index) => (
+        <tr key={index}>
+          <td>{student.name}</td>
+          <td>{student.nim_tpb}</td>
+          <td>{student.nim_jur}</td>
+          <td>{student.prodi}</td>
+        </tr>
+      ));
+    }
+
+    return (
+      <tr>
+        <td
+          colSpan={4}
+          className="text-center"
+        >
+          No Student Found
+        </td>
+      </tr>
     );
   }
   
@@ -217,7 +289,7 @@ class Home extends React.PureComponent {
                 </CardHeader>
 
                 <CardBody className="card-table">
-                  <Table responsive>
+                  <Table responsive className="mb-0">
                     <thead>
                       <tr>
                         <th>Nama</th>
@@ -226,19 +298,9 @@ class Home extends React.PureComponent {
                         <th>Prodi</th>
                       </tr>
                     </thead>
+              
                     <tbody>
-                      <tr>
-                        <td>Ikraduya Edian</td>
-                        <td>16517187</td>
-                        <td>13517106</td>
-                        <td>Teknik Informatika</td>
-                      </tr>
-                      <tr>
-                        <td>Ikraduya Edian 2</td>
-                        <td>16517000</td>
-                        <td>13517000</td>
-                        <td>Teknik Informatika</td>
-                      </tr>
+                      {this.renderStudentList()}
                     </tbody>
                   </Table>
                 </CardBody>
