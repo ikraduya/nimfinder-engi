@@ -16,6 +16,8 @@ import Swal from 'sweetalert2';
 import FontAwesome from 'react-fontawesome';
 import querystring from 'querystring';
 import { Redirect, withRouter, Link } from 'react-router-dom';
+import Cookies from 'universal-cookie';
+
 
 class Register extends React.PureComponent {
   constructor(props) {
@@ -34,6 +36,24 @@ class Register extends React.PureComponent {
     this.handleConPasswordChange = this.handleConPasswordChange.bind(this);
     this.renderButtonText = this.renderButtonText.bind(this);
     this.onRegisterPress = this.onRegisterPress.bind(this);
+  }
+
+  componentDidMount() {
+    const cookies = new Cookies();
+    const cookiesToken = cookies.get('token');
+    if (cookiesToken && cookiesToken.length > 0) {  // token is available
+      Swal.fire({
+        title: 'You have already Log In',
+        type: 'info',
+        text: 'Redirecting...',
+        timer: '2000',
+        animation: true
+      }).then(() => {
+        this.setState({
+          redirect: '/',
+        })
+      })
+    }
   }
 
   handleUsernameChange({target}) {
