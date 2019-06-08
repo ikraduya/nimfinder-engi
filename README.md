@@ -33,11 +33,11 @@ Jika sudah login, langsung ke langkah 6
 Kemudian klik "**Login**". Apabila berhasil, Anda akan diarahkan ke *homepage*
 
 4. Apabila belum mendaftar, klik tulisan "**Don't have account? Sign Up**"  
-Anda akan diarahkan ke halaman pendaftaran
+Anda akan diarahkan menuju halaman pendaftaran
 
 5. Di halaman pendaftaran, masukkan username, password, dan konfirmasi password
 ![pageregister.png](readme_files/pageregister.png)
-Kemudian klik "**Register**". Apabila berhasil, anda akan diarahkan ke halaman login
+Kemudian klik "**Register**". Apabila berhasil, anda akan diarahkan menuju halaman login
 
 6. Berikut tampilan awal *Homepage*
 ![homepage.png](readme_files/homepage.png)
@@ -85,11 +85,11 @@ Penjelasan:
 - components = kelas-kelas komponen halaman
 
 ## Kelas Komponen
-Aromage NIMFinder terdiri dari enam kelas komponen. Tiga di folder common dan tiga di folder components. Semua diturunkan dari React.PureComponent.
+Aromage NIMFinder terdiri dari enam kelas komponen. Tiga di folder common dan tiga di folder components. Semua diturunkan dari *React.PureComponent*.
 ### Footer
 Kelas ini berisi footer ditampilkan di seluruh halaman aplikasi
 ### Header
-Kelas ini berisi header yang ditampilkan di seluruh halaman aplikasi, kecuali halaman autentikasi (login dan register)
+Kelas ini berisi header yang ditampilkan di seluruh halaman aplikasi, kecuali halaman autentikasi (*login* dan *register*)
 ### Layout
 Kelas ini berfungsi sebagai layout halaman. Menentukan apakah layout memerlukan header atau tidak.
 ### Home
@@ -103,6 +103,10 @@ Kelas ini berfungsi untuk autentikasi registrasi.
 Ketika aplikasi dijalankan menggunakan `npm start` atau dari hasil build, index.js pada root akan terpanggil dan merender App.js.  
 Di dalam App.js terdapat routing yang akan menampilkan halaman sesuai dengan path yang diberikan.
 
+## Design Pattern
+Aplikasi ini menerapkan **Decorator Design Pattern**, yaitu dengan digunakannya high order component. Terlihat di App.js terdapat digunakannya kelas Layout sebagai high order component.
+
+
 # Kakas
 - [axios](https://github.com/axios/axios) - Promise based HTTP Client
 - [bootstrap](https://getbootstrap.com/) - Free and open-source front-end framework for designing websites and web applications
@@ -115,9 +119,13 @@ Di dalam App.js terdapat routing yang akan menampilkan halaman sesuai dengan pat
 
 # Review terhadap desain API
 ## Paginasi
-API belum sempurna dalam mengimplementasikan paginasi karena tidak mengirimkan data jumlah page ataupun atau hasil seluruh query pada response endpoint /byid dan /byname
+API belum sempurna dalam mengimplementasikan paginasi karena tidak mengirimkan data jumlah page ataupun atau hasil seluruh query pada response endpoint **/byid** dan **/byname**
+
+Harusnya dapat dikirimkan juga data jumlah page agar paginasi dapat dinomori.
 ## Sort by
 Setelah mengobservasi, API selalu mengurutkan hasil query berdasarkan NIM Jurusan. Pengguna API kurang dapat mengatur hasil query, karena tidak disediakan sarana 'Sort by'
+
+Harusnya dapat disediakan parameter sortBy agar hasil query dapat diatur.
 ## Header Cookie untuk Login
 Sebelum direvisi, API membutuhkan token di header Cookie untuk melakukan login. Hal ini tidak memungkinkan karena header 'Cookie' termasuk header yang dilarang untuk diset secara manual oleh browser.
 ## Response tanpa Allow-Control-Allow-Origin
