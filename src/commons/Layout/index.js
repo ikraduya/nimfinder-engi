@@ -10,11 +10,11 @@ class Layout extends React.PureComponent {
     this.renderHeader = this.renderHeader.bind(this);
   }
 
-  renderHeader(auth) {
-    if (!auth) {
-      return (<Header />);
+  renderHeader(auth, nomatch) {
+    if (auth || nomatch) {
+      return (<div className="my-4"/>);
     }
-    return (<div className="my-4"/>);
+    return (<Header />);
   }
 
   render() {
@@ -24,8 +24,7 @@ class Layout extends React.PureComponent {
       <Route {...rest} render={(props) => {
         return (
           <div>
-            {/* <Header /> */}
-            {this.renderHeader(rest.auth)}
+            {this.renderHeader(rest.auth, rest.nomatch)}
             <Component {...props}/>
             <Footer />
           </div>
