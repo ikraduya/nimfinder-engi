@@ -54,7 +54,7 @@ class Header extends React.Component {
           <Collapse isOpen={this.state.isOpen} navbar>
             <Nav className="ml-auto" navbar>
               <NavItem>
-                <NavLink onClick={this.handleLogout} href="#">Logout</NavLink>
+                <NavLink style={{color: 'white'}} onClick={this.handleLogout} href="#">Logout</NavLink>
               </NavItem>
             </Nav>
           </Collapse>

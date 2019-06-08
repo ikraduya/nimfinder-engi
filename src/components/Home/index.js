@@ -33,6 +33,7 @@ class Home extends React.PureComponent {
     this.toggleDropDownResultPerPage = this.toggleDropDownResultPerPage.bind(this);
     this.selectSearchByParam = this.selectSearchByParam.bind(this);
     this.selectResultPerPageParam = this.selectResultPerPageParam.bind(this);
+    this.handleSearch = this.handleSearch.bind(this);
     this.handleSearchTextChange = this.handleSearchTextChange.bind(this);
     this.handlePageChange = this.handlePageChange.bind(this);
     this.fetchStudentData = this.fetchStudentData.bind(this);
@@ -83,6 +84,14 @@ class Home extends React.PureComponent {
         this.fetchStudentData();
       })
     }
+  }
+
+  handleSearch() {
+    this.setState({
+      page: 0,
+    }, () => {
+      this.fetchStudentData()
+    })
   }
 
   handleSearchTextChange({ target }) {
@@ -202,10 +211,10 @@ class Home extends React.PureComponent {
     return (
       <Pagination>
         <PaginationItem className="text-center"  style={{marginRight: "auto", width: "90px"}} disabled={page === 0}>
-          <PaginationLink href="#" onClick={() => this.handlePageChange(page-1)} >Previous</PaginationLink>
+          <PaginationLink href="#" onClick={(e) => {e.preventDefault(); this.handlePageChange(page-1)}} >Previous</PaginationLink>
         </PaginationItem>
         <PaginationItem className="text-center" style={{marginLeft: "auto", width: "90px"}} disabled={!nextPageAvailable}>
-          <PaginationLink href="#" onClick={() => this.handlePageChange(page+1)} >Next</PaginationLink>
+          <PaginationLink href="#" onClick={(e) => {e.preventDefault(); this.handlePageChange(page+1)}} >Next</PaginationLink>
         </PaginationItem>
       </Pagination>
     );
@@ -284,12 +293,12 @@ class Home extends React.PureComponent {
                       </DropdownMenu>
                     </InputGroupButtonDropdown>
 
-                    <Button className="ml-2" color="primary" onClick={this.fetchStudentData}>Search</Button>
+                    <Button className="ml-2" color="primary" onClick={this.handleSearch}>Search</Button>
                   </InputGroup>
                 </CardHeader>
 
                 <CardBody className="card-table">
-                  <Table responsive className="mb-0">
+                  <Table responsive striped className="mb-0">
                     <thead>
                       <tr>
                         <th>Nama</th>

@@ -32,6 +32,7 @@ class Register extends React.PureComponent {
     this.handleUsernameChange = this.handleUsernameChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
     this.handleConPasswordChange = this.handleConPasswordChange.bind(this);
+    this.renderButtonText = this.renderButtonText.bind(this);
     this.onRegisterPress = this.onRegisterPress.bind(this);
   }
 
