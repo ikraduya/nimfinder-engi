@@ -57,10 +57,9 @@ class Login extends React.PureComponent {
 
   onLoginPress() {
     const { username, password } = this.state;
-    this.setState(prevState => ({
-      ...prevState,
+    this.setState({
       loading: true,
-    }));
+    });
     const config = {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -81,11 +80,9 @@ class Login extends React.PureComponent {
           }).then(() => {
             const cookies = new Cookies();
             cookies.set('token', data.token, {
-              maxAge: 60 * 60 * 24, 
-              // domain: "https://api.stya.net/nim",
+              maxAge: 60 * 60 * 24,   // set cookies age for 1 day
             });
             this.setState({
-              loading: false,
               redirect: '/',
             });
           });
@@ -97,10 +94,6 @@ class Login extends React.PureComponent {
             timer: '2000',
             animation: true
           });
-          this.setState({
-            loading: false,
-            password: '',
-          });
         }
       })
       .catch(() => {
@@ -111,11 +104,13 @@ class Login extends React.PureComponent {
           timer: '2000',
           animation: true
         });
+      })
+      .finally(() => {
         this.setState({
           loading: false,
           password: '',
         });
-      });
+      })
   }
 
   handleUsernameChange({ target }) {

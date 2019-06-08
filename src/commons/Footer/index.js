@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container, Row, Col } from 'reactstrap';
 
-class Footer extends React.Component {
+class Footer extends React.PureComponent {
   render() {
     return (
       <Container>

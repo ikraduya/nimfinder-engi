@@ -12,7 +12,7 @@ import {
 import { Link, Redirect} from 'react-router-dom';
 import Cookies from 'universal-cookie';
 
-class Header extends React.Component {
+class Header extends React.PureComponent {
   constructor(props) {
     super(props);
 

@@ -20,10 +20,10 @@ import {
   PaginationItem,
   PaginationLink,
 } from 'reactstrap';
+import FontAwesome from 'react-fontawesome';
 import Swal from 'sweetalert2';
 import { Redirect, withRouter } from 'react-router-dom';
 import Cookies from 'universal-cookie';
-// import * as xhr2 from 'xhr2';
 
 class Home extends React.PureComponent {
   constructor(props) {
@@ -37,10 +37,12 @@ class Home extends React.PureComponent {
     this.handleSearchTextChange = this.handleSearchTextChange.bind(this);
     this.handlePageChange = this.handlePageChange.bind(this);
     this.fetchStudentData = this.fetchStudentData.bind(this);
+    this.renderButtonText = this.renderButtonText.bind(this);
     this.renderPagination = this.renderPagination.bind(this);
     this.renderStudentList = this.renderStudentList.bind(this);
 
     this.state = {
+      loading: false,
       dropDownSearchByText: 'Search By: NIM',
       dropDownSearchByOpen: false,
       dropDownResultPerPageText: 'Result Per Page: 10',
@@ -136,6 +138,15 @@ class Home extends React.PureComponent {
 
   fetchStudentData() {
     const { searchText, searchBy, maxItem, page, cookiesToken } = this.state;
+    if (searchText === '') {
+      this.setState({
+        studentList: [],
+      })
+      return;
+    }
+    this.setState({
+      loading: true,
+    })
 
     let params;
     if (searchBy === "id") {  // by nim
@@ -203,6 +214,24 @@ class Home extends React.PureComponent {
           text: 'Could not contact the server'
         });
       })
+      .finally(() => {
+        this.setState({
+          loading: false,
+        });
+      })
+  }
+
+  renderButtonText() {
+    if (this.state.loading) {
+      return (
+        <FontAwesome
+          name='spinner'
+          spin
+        />
+      );
+    }
+
+    return 'Search';
   }
 
   renderPagination() {
@@ -232,7 +261,6 @@ class Home extends React.PureComponent {
         </tr>
       ));
     }
-
     return (
       <tr>
         <td
@@ -269,6 +297,11 @@ class Home extends React.PureComponent {
                       onChange={this.handleSearchTextChange}
                       value={searchText || ''}
                       name="search-text"
+                      onKeyPress={(e) => {
+                        if (e.which === 13) { //enter
+                          this.handleSearch();
+                        }
+                      }}
                     />
                     
                     <InputGroupButtonDropdown addonType="append" isOpen={dropDownSearchByOpen} toggle={this.toggleDropDownSearchBy}>
@@ -293,7 +326,7 @@ class Home extends React.PureComponent {
                       </DropdownMenu>
                     </InputGroupButtonDropdown>
 
-                    <Button className="ml-2" color="primary" onClick={this.handleSearch}>Search</Button>
+                    <Button className="ml-2" color="primary" onClick={this.handleSearch}>{this.renderButtonText()}</Button>
                   </InputGroup>
                 </CardHeader>
 
